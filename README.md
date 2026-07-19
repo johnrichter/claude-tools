@@ -1,6 +1,6 @@
 # claude-tools
 
-Tooling for working with Claude / Claude Code. (confirm/refine)
+Tooling for working with Claude / Claude Code.
 
 ## Claude Code setup
 
