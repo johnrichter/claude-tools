@@ -1,0 +1,79 @@
+{
+  "operations": [
+    {
+      "name": "platform-detect",
+      "cli": {
+        "invocation_prefix": "claude-tools platform",
+        "bin_name": "claude-tools",
+        "bin_env": "CLAUDE_TOOLS_BIN",
+        "usage_hint": "claude-tools platform"
+      },
+      "raw": {
+        "tool_name": "Bash",
+        "command_prefixes": ["uname"]
+      }
+    },
+    {
+      "name": "resource-guard",
+      "cli": {
+        "invocation_prefix": "claude-tools guard preflight",
+        "bin_name": "claude-tools",
+        "bin_env": "CLAUDE_TOOLS_BIN",
+        "usage_hint": "claude-tools guard preflight [--min-free-memory-bytes N] [--min-open-files N]"
+      },
+      "raw": {
+        "tool_name": "Bash",
+        "command_prefixes": ["free -m", "ulimit -n"]
+      }
+    },
+    {
+      "name": "bounded-exec",
+      "cli": {
+        "invocation_prefix": "claude-tools exec --",
+        "bin_name": "claude-tools",
+        "bin_env": "CLAUDE_TOOLS_BIN",
+        "usage_hint": "claude-tools exec -- <command> [args...]"
+      },
+      "raw": {
+        "tool_name": "Bash",
+        "command_prefixes": ["go test", "go build"]
+      }
+    },
+    {
+      "name": "remote-fetch",
+      "cli": {
+        "invocation_prefix": "claude-tools fetch",
+        "bin_name": "claude-tools",
+        "bin_env": "CLAUDE_TOOLS_BIN",
+        "usage_hint": "claude-tools fetch sitemap|article|feed <url>"
+      },
+      "raw": {
+        "tool_name": "WebFetch"
+      }
+    },
+    {
+      "name": "state-read",
+      "cli": {
+        "invocation_prefix": "claude-tools state get",
+        "bin_name": "claude-tools",
+        "bin_env": "CLAUDE_TOOLS_BIN",
+        "usage_hint": "claude-tools state get --path <file> --key <key>"
+      },
+      "raw": {
+        "tool_name": "Read"
+      }
+    },
+    {
+      "name": "state-write",
+      "cli": {
+        "invocation_prefix": "claude-tools state set",
+        "bin_name": "claude-tools",
+        "bin_env": "CLAUDE_TOOLS_BIN",
+        "usage_hint": "claude-tools state set --path <file> --key <key> --value <json>"
+      },
+      "raw": {
+        "tool_name": "Write"
+      }
+    }
+  ]
+}
