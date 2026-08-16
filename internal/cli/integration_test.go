@@ -117,8 +117,8 @@ func TestGuardPreflightSucceedsWhenFloorIsZero(t *testing.T) {
 	}
 }
 
-func TestExecCapturesStdoutAndExitCode(t *testing.T) {
-	out, code := runCLI(t, "exec", "--", "sh", "-c", "echo hi; exit 3")
+func TestRunCapturesStdoutAndExitCode(t *testing.T) {
+	out, code := runCLI(t, "run", "--", "sh", "-c", "echo hi; exit 3")
 	if code != 0 {
 		t.Fatalf("cli exit code = %d, want 0 (a non-zero child exit is still cli-success); out=%s", code, out)
 	}
@@ -132,15 +132,15 @@ func TestExecCapturesStdoutAndExitCode(t *testing.T) {
 	}
 }
 
-func TestExecRequiresAtLeastOneArg(t *testing.T) {
-	out, code := runCLI(t, "exec")
+func TestRunRequiresAtLeastOneArg(t *testing.T) {
+	out, code := runCLI(t, "run")
 	if code == 0 {
-		t.Fatalf("exit code = 0, want nonzero for exec with no command; out=%s", out)
+		t.Fatalf("exit code = 0, want nonzero for run with no command; out=%s", out)
 	}
 }
 
-func TestExecOnAMissingBinaryReportsInternalFailure(t *testing.T) {
-	out, code := runCLI(t, "exec", "--", "/no/such/binary-claude-tools-test")
+func TestRunOnAMissingBinaryReportsInternalFailure(t *testing.T) {
+	out, code := runCLI(t, "run", "--", "/no/such/binary-claude-tools-test")
 	if code == 0 {
 		t.Fatalf("exit code = 0, want nonzero for an unresolvable binary; out=%s", out)
 	}
@@ -150,8 +150,8 @@ func TestExecOnAMissingBinaryReportsInternalFailure(t *testing.T) {
 	}
 }
 
-func TestExecRespectsATightTimeout(t *testing.T) {
-	out, code := runCLI(t, "--timeout", "50ms", "exec", "--", "sleep", "5")
+func TestRunRespectsATightTimeout(t *testing.T) {
+	out, code := runCLI(t, "--timeout", "50ms", "run", "--", "sleep", "5")
 	if code == 0 {
 		t.Fatalf("exit code = 0, want nonzero -- 5s sleep should not survive a 50ms timeout; out=%s", out)
 	}
@@ -316,14 +316,14 @@ func TestConfigFileTimeoutAppliesWhenNoFlagOverridesIt(t *testing.T) {
 	if err := os.WriteFile(cfgPath, []byte("timeout: 50ms\n"), 0o644); err != nil {
 		t.Fatalf("WriteFile: %v", err)
 	}
-	out, code := runCLI(t, "--config", cfgPath, "exec", "--", "sleep", "5")
+	out, code := runCLI(t, "--config", cfgPath, "run", "--", "sleep", "5")
 	if code == 0 {
 		t.Fatalf("exit code = 0, want nonzero -- the config file's 50ms timeout should have fired; out=%s", out)
 	}
 }
 
 func TestConfigExplicitMissingFileIsAnError(t *testing.T) {
-	out, code := runCLI(t, "--config", "/no/such/claude-tools-config.yaml", "exec", "--", "true")
+	out, code := runCLI(t, "--config", "/no/such/claude-tools-config.yaml", "run", "--", "true")
 	if code == 0 {
 		t.Fatalf("exit code = 0, want nonzero for an explicitly named missing config file; out=%s", out)
 	}

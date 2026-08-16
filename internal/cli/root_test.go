@@ -3,13 +3,13 @@ package cli
 import "testing"
 
 // TestRootCmdSurfacesEverySubcommand is the CLI-shape sanity check: platform, guard,
-// exec, fetch and state (sysops + webfetch + state, per SC-STACK) are all present, and
+// run, fetch and state (sysops + webfetch + state, per SC-STACK) are all present, and
 // --help exits clean without SilenceUsage/SilenceErrors surfacing a cobra-printed
 // usage line ahead of clikit's own Result.
 func TestRootCmdSurfacesEverySubcommand(t *testing.T) {
 	root := newRootCmd()
 
-	want := []string{"platform", "guard", "exec", "fetch", "state"}
+	want := []string{"platform", "guard", "run", "fetch", "state"}
 	for _, name := range want {
 		if _, _, err := root.Find([]string{name}); err != nil {
 			t.Errorf("root command has no %q subcommand: %v", name, err)

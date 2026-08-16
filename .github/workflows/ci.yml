@@ -1,22 +1,18 @@
 # CI for claude-tools: the fleet's generic OS/process/hardware, remote-fetch and state CLI.
 #
-# go.mod `replace`s adoption, clikit, plugin-foundation, state, sysops and webfetch onto
-# ../ai-shared-lib/go/* and ../ai-shared-lib/plugin-foundation (a monorepo-development
-# stand-in until those modules are independently tagged -- see the `replace` block's comment
-# in go.mod). actions/checkout refuses any path outside $GITHUB_WORKSPACE, so every job that
-# runs `go build`/`go vet`/`go test` checks out both repos as workspace siblings
-# (claude-tools, ai-shared-lib) and runs with working-directory: claude-tools, which resolves
-# the replace target at ../ai-shared-lib exactly as a local dev checkout does.
+# go.mod `replace`s clikit, state, sysops and webfetch onto ../ai-shared-lib/go/* (a
+# monorepo-development stand-in until those modules are independently tagged -- see the
+# `replace` block's comment in go.mod). actions/checkout refuses any path outside
+# $GITHUB_WORKSPACE, so every job that runs `go build`/`go vet`/`go test` checks out both
+# repos as workspace siblings (claude-tools, ai-shared-lib) and runs with
+# working-directory: claude-tools, which resolves the replace target at ../ai-shared-lib
+# exactly as a local dev checkout does.
 # claude-shared-tooling is private, so the sibling checkout needs read access via
 # SIBLING_REPO_TOKEN (a PAT scoped to that repo) rather than the default, repo-scoped
 # GITHUB_TOKEN.
 #
 # guardrail gates every other job: SC-VERSIONING (tag-prefix.sh, tag pushes only) and
 # SC-DISTRIBUTION (no-committed-binaries.sh, every run) -- see release/guard/README.md.
-#
-# `go test ./...` includes internal/plugincheck's frozen-fixture adoption test (SC-FORCEDUSE):
-# the plugin's own routing-rules.json, loaded through plugin-foundation's BuildRegistry, must
-# clear the Phase-A adoption gate on the committed fixture transcript.
 
 name: CI
 

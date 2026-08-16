@@ -1,8 +1,0 @@
-{
-    "name": "claude-tools",
-    "description": "Forces Claude toward claude-tools (platform detection, resource guards, bounded subprocess execution, remote sitemap/article/feed fetch, crash-safe state) instead of the raw Bash/Read/Write/WebFetch calls it supersedes; provisions the binary on session start.",
-    "author": {
-        "name": "John Richter"
-    },
-    "version": "0.1.0"
-}

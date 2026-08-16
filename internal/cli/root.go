@@ -38,7 +38,7 @@ state file.`,
 		Example: strings.TrimLeft(`
   claude-tools platform
   claude-tools guard preflight --min-free-memory-bytes 536870912
-  claude-tools exec -- go test ./...
+  claude-tools run -- go test ./...
   claude-tools fetch article https://example.com/post
   claude-tools state set --path .claude-tools/state.json --key last_run --value '"2026-07-27"'
 `, "\n"),
@@ -47,12 +47,12 @@ state file.`,
 	}
 	root.PersistentFlags().String("config", "", "path to a YAML config file (flag > env > file > default)")
 	root.PersistentFlags().Duration("timeout", 0, "default timeout for a subprocess or remote fetch (default 30s)")
-	root.PersistentFlags().Int("max-stdout-bytes", 0, "captured stdout cap in bytes for exec (default 1MiB)")
-	root.PersistentFlags().Int("max-stderr-bytes", 0, "captured stderr cap in bytes for exec (default 1MiB)")
+	root.PersistentFlags().Int("max-stdout-bytes", 0, "captured stdout cap in bytes for run (default 1MiB)")
+	root.PersistentFlags().Int("max-stderr-bytes", 0, "captured stderr cap in bytes for run (default 1MiB)")
 
 	root.AddCommand(newPlatformCmd())
 	root.AddCommand(newGuardCmd())
-	root.AddCommand(newExecCmd())
+	root.AddCommand(newRunCmd())
 	root.AddCommand(newFetchCmd())
 	root.AddCommand(newStateCmd())
 	return root

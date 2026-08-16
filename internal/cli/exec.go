@@ -6,13 +6,13 @@ import (
 	"github.com/johnrichter/claude-shared-tooling/go/sysops"
 )
 
-func newExecCmd() *cobra.Command {
+func newRunCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "exec -- <command> [args...]",
+		Use:   "run -- <command> [args...]",
 		Short: "Run a subprocess with a bounded timeout and captured, size-capped output",
 		Args:  cobra.MinimumNArgs(1),
-		Example: `  claude-tools exec -- go test ./...
-  claude-tools exec --timeout 10s --dir /tmp -- ls -la`,
+		Example: `  claude-tools run -- go test ./...
+  claude-tools run --timeout 10s --dir /tmp -- ls -la`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cfg, err := loadConfig(cmd.Flags())
 			if err != nil {
