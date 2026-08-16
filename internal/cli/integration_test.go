@@ -47,10 +47,10 @@ func runCLI(t *testing.T, args ...string) (string, int) {
 	orig := os.Stdout
 	os.Stdout = w
 	code := emitUsageError(ranCmd, err)
-	w.Close()
+	_ = w.Close()
 	os.Stdout = orig
 	var out bytes.Buffer
-	out.ReadFrom(r)
+	_, _ = out.ReadFrom(r)
 	return out.String(), code
 }
 
@@ -241,13 +241,13 @@ func newFetchTestServer(t *testing.T) *httptest.Server {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/sitemap.xml", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/xml")
-		w.Write([]byte(`<?xml version="1.0"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+		_, _ = w.Write([]byte(`<?xml version="1.0"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 <url><loc>` + "http://" + r.Host + `/blog/a</loc><lastmod>2026-01-15</lastmod></url>
 <url><loc>` + "http://" + r.Host + `/other/b</loc><lastmod>2026-02-01</lastmod></url>
 </urlset>`))
 	})
 	mux.HandleFunc("/article.html", func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte(`<html><head><title>T</title><meta name="description" content="d"></head></html>`))
+		_, _ = w.Write([]byte(`<html><head><title>T</title><meta name="description" content="d"></head></html>`))
 	})
 	mux.HandleFunc("/notfound.html", func(w http.ResponseWriter, r *http.Request) {
 		http.NotFound(w, r)

@@ -1,15 +1,8 @@
 # CI for claude-tools: the fleet's generic OS/process/hardware, remote-fetch and state CLI.
 #
-# go.mod `replace`s clikit, state, sysops and webfetch onto ../ai-shared-lib/go/* (a
-# monorepo-development stand-in until those modules are independently tagged -- see the
-# `replace` block's comment in go.mod). actions/checkout refuses any path outside
-# $GITHUB_WORKSPACE, so every job that runs `go build`/`go vet`/`go test` checks out both
-# repos as workspace siblings (claude-tools, ai-shared-lib) and runs with
-# working-directory: claude-tools, which resolves the replace target at ../ai-shared-lib
-# exactly as a local dev checkout does.
-# claude-shared-tooling is private, so the sibling checkout needs read access via
-# SIBLING_REPO_TOKEN (a PAT scoped to that repo) rather than the default, repo-scoped
-# GITHUB_TOKEN.
+# go.mod has no local replace directive: it resolves clikit, state, sysops and webfetch
+# from claude-shared-tooling's public module proxy at their tagged versions, so every job
+# that runs go build/vet/test only needs to check out this repo.
 #
 # guardrail gates every other job: SC-VERSIONING (tag-prefix.sh, tag pushes only) and
 # SC-DISTRIBUTION (no-committed-binaries.sh, every run) -- see release/guard/README.md.
@@ -53,13 +46,6 @@ jobs:
         with:
           path: claude-tools
 
-      - name: Checkout ai-shared-lib sibling (go.mod replace target)
-        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
-        with:
-          repository: johnrichter/claude-shared-tooling
-          token: ${{ secrets.SIBLING_REPO_TOKEN }}
-          path: ai-shared-lib
-
       - uses: actions/setup-go@40f1582b2485089dde7abd97c1529aa768e1baff # v5
         with:
           go-version-file: claude-tools/go.mod
@@ -89,13 +75,6 @@ jobs:
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
         with:
           path: claude-tools
-
-      - name: Checkout ai-shared-lib sibling (go.mod replace target)
-        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
-        with:
-          repository: johnrichter/claude-shared-tooling
-          token: ${{ secrets.SIBLING_REPO_TOKEN }}
-          path: ai-shared-lib
 
       - uses: actions/setup-go@40f1582b2485089dde7abd97c1529aa768e1baff # v5
         with:
