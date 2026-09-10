@@ -227,6 +227,13 @@ xcuserdata
 bin/
 tmp/
 
+# Go local check artifacts. This module's main package is the repo root, so the
+# bare `go build` language-tools' build check runs writes the binary here, and
+# its test check writes coverage.out here. Both are build output, never
+# committed (SC-DISTRIBUTION: binaries ship as release archives + checksums).
+/claude-tools
+/coverage.out
+
 ###############################################################################
 # Universal caches / logs / temp
 ###############################################################################

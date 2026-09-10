@@ -28,6 +28,6 @@ jobs:
       module_dir: "."
       tag_module: "."
       language: go
-      binaries: "claude-tools:cmd/claude-tools"
+      binaries: "claude-tools:."
     secrets:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
