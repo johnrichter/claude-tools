@@ -1,20 +1,11 @@
 # SC-DISTRIBUTION release: claude-tools cross-compiles itself into per-OS/arch archives +
-# checksums and publishes them as the tag's official GitHub release. No matrix of runners is
-# needed -- Go's cross-compilation builds every GOOS/GOARCH cell from one Linux host.
+# checksums and publishes them as the tag's official GitHub release, through the fleet's
+# shared release-cli.yml template.
 #
-# Triggers on a vX.Y.Z tag push (SC-VERSIONING: tag prefix == module path from repo root,
-# which is empty for this single, root-level module; this workflow's own tag-validate step
-# enforces it). A manual workflow_dispatch run defaults to dry_run: true, so a change to
-# this file can be exercised without cutting a tag or touching GitHub Releases.
-#
-# go.mod has no local replace directive: it resolves claude-shared-tooling's go/* modules
-# straight from the public module proxy at their tagged versions, so a single checkout of
-# this repo is enough for go build/test to work.
-#
-# This workflow validates the tag itself rather than trusting ci.yml's build-test job: a
-# tag push fires both workflows independently, and neither GitHub Actions run gates the
-# other, so a malformed tag rejected by ci.yml would otherwise still reach `gh release
-# create` here undisturbed.
+# Triggers on a vX.Y.Z tag push, or a manual dispatch naming the same shape. The template's
+# own tag-format check reads tag_module "." against this repo's own language-tools.yaml
+# (path ".", tag_form bare) — a bare tag is exactly what both trigger paths here produce, so
+# the pattern below is unchanged.
 
 name: SC-DISTRIBUTION release
 
@@ -24,99 +15,19 @@ on:
       - 'v[0-9]+.[0-9]+.[0-9]+'
   workflow_dispatch:
     inputs:
-      dry_run:
-        description: "Build archives + checksums; skip the platform release."
-        type: boolean
-        default: true
-
-permissions:
-  contents: write
+      version:
+        description: "Tag to cut, e.g. v1.2.3"
+        required: true
+        type: string
 
 jobs:
-  build-and-publish:
-    name: build-and-publish
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: claude-tools
-    steps:
-      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
-        with:
-          path: claude-tools
-
-      # Installs language-tools 2.1.0 from its own published GitHub release,
-      # verifying the downloaded archive's sha256 against that release's own
-      # checksums.txt and failing closed on a mismatch (CONTRACT-CI-LT-INSTALL).
-      # Runs only on a tag push, the same condition as the tag-validate step it
-      # feeds, so a workflow_dispatch run downloads nothing.
-      - name: Install language-tools (pinned release)
-        if: ${{ github.event_name == 'push' }}
-        env:
-          LANGUAGE_TOOLS_VERSION: "2.1.0"
-          LANGUAGE_TOOLS_REPO: johnrichter/language-tools
-        run: |
-          set -euo pipefail
-          archive="language-tools_${LANGUAGE_TOOLS_VERSION}_linux_amd64.tar.gz"
-          base_url="https://github.com/${LANGUAGE_TOOLS_REPO}/releases/download/v${LANGUAGE_TOOLS_VERSION}"
-          curl -fsSL -o "${archive}" "${base_url}/${archive}"
-          curl -fsSL -o checksums.txt "${base_url}/checksums.txt"
-          grep " ${archive}\$" checksums.txt | sha256sum -c -
-          mkdir -p "${HOME}/.local/bin"
-          tar -xzf "${archive}" -C "${HOME}/.local/bin" language-tools
-          chmod +x "${HOME}/.local/bin/language-tools"
-          echo "${HOME}/.local/bin" >> "$GITHUB_PATH"
-          rm -f "${archive}" checksums.txt
-
-      - name: Tag conforms to SC-VERSIONING
-        if: ${{ github.event_name == 'push' }}
-        run: language-tools tag validate "${GITHUB_REF_NAME}" --module .
-
-      - uses: actions/setup-go@40f1582b2485089dde7abd97c1529aa768e1baff # v5
-        with:
-          go-version-file: claude-tools/go.mod
-
-      # A tag push names the release directly; a manual dispatch has no tag, so it
-      # synthesizes one for the archive filenames only -- dry_run always skips the
-      # publish step below, so that placeholder never reaches a real release.
-      - name: Resolve release tag + version
-        id: version
-        run: |
-          if [ "${GITHUB_REF_TYPE}" = "tag" ]; then
-            tag="${GITHUB_REF_NAME}"
-          else
-            tag="v0.0.0-dryrun.${GITHUB_RUN_ID}"
-          fi
-          echo "tag=${tag}" >> "$GITHUB_OUTPUT"
-          echo "version=${tag#v}" >> "$GITHUB_OUTPUT"
-
-      # Go's cross-compilation needs no native hardware per target -- every cell of this
-      # matrix builds from the one Linux runner.
-      - name: Cross-compile per-OS/arch archives + checksums
-        run: |
-          set -euo pipefail
-          version="${{ steps.version.outputs.version }}"
-          mkdir -p dist
-          for target in linux/amd64 linux/arm64 darwin/amd64 darwin/arm64; do
-            os="${target%/*}"
-            arch="${target#*/}"
-            bin="claude-tools"
-            workdir="$(mktemp -d)"
-            GOOS="$os" GOARCH="$arch" CGO_ENABLED=0 go build -trimpath -ldflags='-s -w' -o "${workdir}/${bin}" ./cmd/claude-tools
-            archive="dist/claude-tools_${version}_${os}_${arch}.tar.gz"
-            tar -czf "${archive}" -C "${workdir}" "${bin}"
-            rm -rf "${workdir}"
-          done
-          ( cd dist && sha256sum claude-tools_*.tar.gz | sort -k2 > checksums.txt )
-          ls -la dist
-
-      - name: Publish the official release (per-OS/arch archives + checksums)
-        if: ${{ github.event_name == 'push' }}
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: gh release create "${{ steps.version.outputs.tag }}" --title "${{ steps.version.outputs.tag }}" --generate-notes dist/*.tar.gz dist/checksums.txt
-
-      - name: Dry-run summary
-        if: ${{ github.event_name != 'push' }}
-        run: |
-          echo "dry-run: built archives + checksums for ${{ steps.version.outputs.tag }} - publish skipped"
-          ls -la dist
+  release-cli:
+    uses: johnrichter/claude-shared-tooling/.github/workflows/release-cli.yml@v0.4.0
+    with:
+      version: ${{ inputs.version || github.ref_name }}
+      module_dir: "."
+      tag_module: "."
+      language: go
+      binaries: "claude-tools:cmd/claude-tools"
+    secrets:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
