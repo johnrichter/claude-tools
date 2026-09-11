@@ -8,6 +8,10 @@
 # not here: a CI run carries no tag, so this workflow validates nothing tag-shaped.
 # SC-DISTRIBUTION's committed-binary check runs at commit time and at each git-tools
 # governed write, not here (R7).
+#
+# SC39's workflow-lint call (ci-workflow.yml) covers this repository once, at its own
+# root, catching every tracked workflow body below it -- including this file and
+# release.yml -- rather than one call per body.
 
 name: CI
 
@@ -23,3 +27,8 @@ jobs:
     with:
       module_dir: "."
       test_timeout: 300
+
+  ci-workflow:
+    uses: johnrichter/claude-shared-tooling/.github/workflows/ci-workflow.yml@v0.4.0
+    with:
+      target_root: "."
