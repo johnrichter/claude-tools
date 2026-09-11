@@ -22,8 +22,8 @@ github.com/johnrichter/claude-shared-tooling/go/logkit v0.1.0 h1:IOOkbM68r9LZVjE
 github.com/johnrichter/claude-shared-tooling/go/logkit v0.1.0/go.mod h1:aU9nqkTe2bWabq6tcuqaQ8S9CAiJx4PZn6i1P+1I+Ys=
 github.com/johnrichter/claude-shared-tooling/go/state v0.1.0 h1:D76t+ulBbi46uCirSA8BUthE7BH2WBfjWO91ZrU0JME=
 github.com/johnrichter/claude-shared-tooling/go/state v0.1.0/go.mod h1:chT/IlIdB/P+I16ZarlcFMr2IkNe1063Ngw/rrmyB1U=
-github.com/johnrichter/claude-shared-tooling/go/sysops v0.1.0 h1:8Vs90UdK7zgG0UzFkmDdfAQhvafxVndLtddzP+O6JjY=
-github.com/johnrichter/claude-shared-tooling/go/sysops v0.1.0/go.mod h1:h9vyyXfend/Ie362d9mWKaMAogkDsewruPAtvUORZnY=
+github.com/johnrichter/claude-shared-tooling/go/sysops v0.1.1 h1:gVb6G3rqTcXdfc1qEJHAib/eI6sz7SyP+5znpShFXlA=
+github.com/johnrichter/claude-shared-tooling/go/sysops v0.1.1/go.mod h1:h9vyyXfend/Ie362d9mWKaMAogkDsewruPAtvUORZnY=
 github.com/johnrichter/claude-shared-tooling/go/webfetch v0.1.0 h1:pReSrSakVyAXpI98aceRmRWO8WDENJNZ/SEJGA5aa2M=
 github.com/johnrichter/claude-shared-tooling/go/webfetch v0.1.0/go.mod h1:zk4thqOKQ5S67jGFsSv7wZgP8uHOZKoVlohHGyXW250=
 github.com/knadh/koanf/maps v0.1.2 h1:RBfmAW5CnZT+PJ1CVc1QSJKf4Xu9kxfQgYVQSu8hpbo=
